@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ramo de Flores Animado</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="ramoCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('ramoCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = 400;
+        canvas.height = 600;
+
+        const flowers = [
+            { x: 200, y: 150, petalColor: '#FF8A5B', coreColor: '#FFFF99', angleOffset: 0, leafAngle: 0 },
+            { x: 260, y: 200, petalColor: '#C085FF', coreColor: '#FFFF99', angleOffset: 0.5, leafAngle: 0.2 },
+            { x: 140, y: 200, petalColor: '#66CCFF', coreColor: '#FFFF99', angleOffset: 1, leafAngle: -0.2 },
+            { x: 220, y: 250, petalColor: '#E67B80', coreColor: '#FFFF99', angleOffset: 1.5, leafAngle: 0.1 },
+            { x: 280, y: 280, petalColor: '#FFD966', coreColor: '#FFFF99', angleOffset: 2, leafAngle: 0.3 }
+        ];
+
+        let time = 0;
+
+        function drawFlower(x, y, petalColor, coreColor) {
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = coreColor;
+            ctx.fill();
+
+            ctx.fillStyle = petalColor;
+            const petalRadius = 25;
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * 60) * Math.PI / 180;
+                const petalX = x + petalRadius * Math.cos(angle);
+                const petalY = y + petalRadius * Math.sin(angle);
+                ctx.beginPath();
+                ctx.arc(petalX, petalY, 15, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawLeaf(x, y, scaleX, scaleY, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.scale(scaleX, scaleY);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.quadraticCurveTo(20, -50, 0, -100);
+            ctx.quadraticCurveTo(-20, -50, 0, 0);
+            ctx.fillStyle = '#65B009';
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawBouquetWrapper() {
+            ctx.fillStyle = '#FFC0CB';
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2 - 50, 350);
+            ctx.quadraticCurveTo(canvas.width / 2 - 150, 500, canvas.width / 2, 550);
+            ctx.quadraticCurveTo(canvas.width / 2 + 150, 500, canvas.width / 2 + 50, 350);
+            ctx.fill();
+
+            ctx.fillStyle = '#FF007F';
+            ctx.strokeStyle = '#FF007F';
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, 450, 25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2 - 50, 450);
+            ctx.quadraticCurveTo(canvas.width / 2 - 80, 400, canvas.width / 2 - 100, 450);
+            ctx.quadraticCurveTo(canvas.width / 2 - 80, 500, canvas.width / 2 - 50, 450);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2 + 50, 450);
+            ctx.quadraticCurveTo(canvas.width / 2 + 80, 400, canvas.width / 2 + 100, 450);
+            ctx.quadraticCurveTo(canvas.width / 2 + 80, 500, canvas.width / 2 + 50, 450);
+            ctx.fill();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            time += 0.05;
+
+            // Dibuja las hojas con una oscilación suave
+            drawLeaf(200, 300, 1, 1, Math.sin(time) * 0.1);
+            drawLeaf(220, 350, -1, 1, Math.sin(time + 1) * -0.1);
+            drawLeaf(180, 400, 1, -1, Math.sin(time + 2) * 0.1);
+            
+            // Dibuja el envoltorio del ramo
+            drawBouquetWrapper();
+
+            // Dibuja las flores con una oscilación suave
+            flowers.forEach(flower => {
+                const offsetX = Math.sin(time + flower.angleOffset) * 5;
+                const offsetY = Math.cos(time + flower.angleOffset) * 2;
+                drawFlower(flower.x + offsetX, flower.y + offsetY, flower.petalColor, flower.coreColor);
+            });
+            
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
